@@ -1,0 +1,7 @@
+name: Sample
+version: @version@
+main: fr.nobody.sample.Sample
+api-version: 1.16
+prefix: Sample
+authors: [ Sample ]
+description: Sample desc

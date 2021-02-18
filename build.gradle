@@ -1,0 +1,76 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    id 'java'
+    id 'idea'
+}
+
+group = 'fr.nobody'
+version = '1.0-SNAPSHOT'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+def minecraftVersion = '1.16.4'
+
+allprojects {
+    def s = System.getenv("customDir") != null ? System.getenv("customDir") : "./jar/"
+    libsDirName = s
+
+
+    repositories {
+        mavenLocal()
+
+        mavenCentral()
+        maven  {
+            name = 'papermc-repo'
+            url = 'https://papermc.io/repo/repository/maven-public/'
+        }
+        maven {
+            name = 'sonatype'
+            url = 'https://oss.sonatype.org/content/groups/public/'
+        }
+
+        maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+
+        flatDir {
+            dirs 'libs'
+        }
+
+    }
+
+
+}
+
+
+
+dependencies {
+    // from libs folder
+    compile fileTree(dir: 'libs', include: '*.jar')
+
+
+    // base api (from https://papermc.io/repo/#browse/browse:maven-snapshots:com%2Fdestroystokyo%2Fpaper%2Fpaper-api%2F1.16.5-R0.1-SNAPSHOT%2F1.16.5-R0.1-20210216.171921-52)
+    implementation "com.destroystokyo.paper:paper-api:${minecraftVersion}-R0.1-SNAPSHOT"
+//    compileOnly "org.bukkit:craftbukkit:${minecraftVersion}-R0.1-SNAPSHOT" // The full Spigot server with no shadowing. Requires mavenLocal.
+//    compile group: "org.bukkit", name: "craftbukkit", version: "1.16.5-R0.1-SNAPSHOT"
+//    compileOnly "org.spigotmc:spigot:${minecraftVersion}.-R0.1-SNAPSHOT" // The full Spigot server with no shadowing. Requires mavenLocal.
+//    compileOnly 'org.bukkit:bukkit:1.16.4-R0.1-SNAPSHOT' // The Bukkit API with no shadowing.
+
+
+    compile 'org.jetbrains:annotations:16.0.2'
+
+}
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        filter ReplaceTokens, tokens: [version: version]
+    }
+}
+
+
+jar {
+
+
+    doFirst {
+        from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
+    }
+}
